@@ -50,14 +50,46 @@ Computer austragen können.
 - **Kamera-Scan**: `html5-qrcode` (per CDN eingebunden) für Tablets/
   Smartphones/Notebooks mit Kamera an der Werkbank.
 
-## Installation & Start
+## Schnellstart zum Testen auf dem eigenen Desktop
+
+Zum Ausprobieren reicht es, die App auf dem eigenen Rechner zu starten –
+ganz ohne Netzwerk-Konfiguration, nur für Sie selbst sichtbar.
+
+1. **Code herunterladen**: Diesen Branch (`claude/draht-materialwirtschaft-system-sdbcia`)
+   als ZIP von GitHub herunterladen und entpacken, oder per `git clone`
+   auschecken.
+2. **Python installieren**, falls noch nicht vorhanden: von
+   [python.org/downloads](https://www.python.org/downloads/) (bei Windows
+   beim Setup unbedingt "Add python.exe to PATH" ankreuzen).
+3. **Starter-Skript doppelklicken** – je nach Betriebssystem:
+   - Windows: `start-windows.bat`
+   - Mac: `start-mac.command` (beim allerersten Öffnen ggf. mit
+     Rechtsklick → "Öffnen" bestätigen, da macOS unbekannte Skripte erst
+     freigeben lässt)
+   - Linux: `start-linux.sh` (einmalig ausführbar machen:
+     `chmod +x start-linux.sh`)
+
+   Das Skript richtet beim ersten Mal automatisch eine Python-Umgebung
+   ein und installiert alles Nötige (dauert ca. 1–2 Minuten), startet
+   danach den Server und öffnet automatisch den Browser auf
+   `http://127.0.0.1:8000`. Bei jedem weiteren Start geht es sofort los.
+   Zum Beenden einfach das Terminal-/Konsolenfenster schließen.
+
+   Da alles nur lokal auf `127.0.0.1` (dem eigenen Rechner) läuft,
+   funktioniert hier auch der **Kamera-QR-Scanner ohne Zusatzaufwand**
+   (Browser behandeln `localhost` als sicheren Ursprung) – ideal, um den
+   kompletten Scan-Workflow am eigenen Rechner mit der Webcam zu testen,
+   bevor später ggf. weitere Geräte (iPad, Scan-Station) im
+   Firmennetzwerk eingerichtet werden.
+
+Alternativ manuell im Terminal:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
 Danach im Browser `http://localhost:8000` öffnen. Beim ersten Start wird
@@ -68,6 +100,12 @@ die Datenbank automatisch angelegt und mit ca. 160 Beispiel-Drahtartikeln,
 Die Datenbankdatei `materialwirtschaft.db` liegt im Projektverzeichnis
 und wird nicht versioniert (`.gitignore`). Zum Zurücksetzen auf die
 Beispieldaten einfach diese Datei löschen und die App neu starten.
+
+**Für den späteren Mehrbenutzer-Betrieb** (mehrere Rechner/Tablets im
+Firmennetzwerk, z.B. eine feste Scan-Station am iPad) muss der Server
+stattdessen mit `--host 0.0.0.0` auf einem dauerhaft laufenden Rechner
+gestartet werden. Das ist ein separater, kleiner Zusatzschritt – siehe
+dazu die eigene iPad-Anleitung.
 
 ## Typischer Arbeitsablauf
 
