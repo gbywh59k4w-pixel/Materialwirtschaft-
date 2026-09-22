@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Aufträge{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Aufträge ({{ auftraege|length }})</h1>
+    <a href="/auftraege/neu" class="btn btn-primary">+ Neuer Auftrag</a>
+</div>
+
+<form method="get" class="mb-3">
+    <select name="status" class="form-select" style="max-width:260px;" onchange="this.form.submit()">
+        <option value="">Alle Status</option>
+        <option value="offen" {% if status=="offen" %}selected{% endif %}>offen</option>
+        <option value="in_arbeit" {% if status=="in_arbeit" %}selected{% endif %}>in Arbeit</option>
+        <option value="erledigt" {% if status=="erledigt" %}selected{% endif %}>erledigt</option>
+        <option value="storniert" {% if status=="storniert" %}selected{% endif %}>storniert</option>
+    </select>
+</form>
+
+<div class="card">
+<table class="table table-hover mb-0">
+    <thead>
+    <tr><th>Auftrag</th><th>Bezeichnung</th><th>Artikel</th><th>Bedarf</th><th>Gebucht</th><th>Fortschritt</th><th>Status</th><th>Erstellt</th></tr>
+    </thead>
+    <tbody>
+    {% for a in auftraege %}
+    <tr>
+        <td><a href="/auftraege/{{ a.id }}">{{ a.auftragsnummer }}</a></td>
+        <td>{{ a.bezeichnung or "-" }}</td>
+        <td><a href="/materialien/{{ a.material_id }}">{{ a.material.artikelnummer }}</a></td>
+        <td>{{ "%.1f"|format(a.bedarf_kg) }} kg</td>
+        <td>{{ "%.1f"|format(a.gebucht_kg) }} kg</td>
+        <td style="min-width:120px;">
+            <div class="progress" style="height:8px;">
+                <div class="progress-bar" style="width:{{ a.fortschritt_prozent }}%;"></div>
+            </div>
+        </td>
+        <td><span class="badge badge-status-{{ a.status }}">{{ a.status }}</span></td>
+        <td>{{ a.erstellt_am.strftime("%d.%m.%Y") }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8" class="text-center text-muted py-4">Keine Aufträge gefunden.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

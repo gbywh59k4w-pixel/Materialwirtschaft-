@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Scan-Station{% endblock %}
+{% block content %}
+<div class="text-center mb-4">
+    <h1 class="h3">📷 Scan-Station</h1>
+    <p class="text-muted">Auftrags- oder Artikel-Code scannen (USB-/Bluetooth-Scanner oder Kamera), um Material direkt auszubuchen.</p>
+</div>
+
+{% if fehler %}
+<div class="alert alert-danger text-center" style="max-width:600px; margin: 0 auto 1rem;">{{ fehler }}</div>
+{% endif %}
+
+<div class="card p-4 mx-auto" style="max-width: 600px;">
+    <form method="post" action="/scan" id="scan-form">
+        <label class="form-label text-center d-block">Code scannen oder eingeben</label>
+        <input type="text" id="scan-input" name="code" class="form-control mb-3" autofocus autocomplete="off"
+               placeholder="z.B. A-000001 oder DR-4.90-C4C">
+        <button type="submit" class="btn btn-primary w-100 mb-2">Buchen</button>
+    </form>
+
+    <button id="camera-toggle" class="btn btn-outline-secondary w-100">📷 Kamera-Scanner starten</button>
+    <div id="qr-reader" class="mt-3" style="display:none;"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="/static/js/scan.js"></script>
+{% endblock %}

@@ -1,0 +1,43 @@
+body {
+    background-color: #f5f6f8;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.badge-status-offen { background-color: #6c757d; }
+.badge-status-in_arbeit { background-color: #fd7e14; }
+.badge-status-erledigt { background-color: #198754; }
+.badge-status-storniert { background-color: #adb5bd; }
+
+.table-unterbestand td {
+    background-color: #fff3cd !important;
+}
+
+#scan-input {
+    font-size: 1.5rem;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+#qr-reader {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.etikett {
+    width: 340px;
+    border: 1px dashed #999;
+    padding: 12px;
+    text-align: center;
+    page-break-inside: avoid;
+}
+
+@media print {
+    .no-print { display: none !important; }
+    body { background: #fff; }
+    main { padding: 0 !important; }
+}

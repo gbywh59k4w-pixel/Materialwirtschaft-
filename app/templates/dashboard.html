@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Dashboard</h1>
+    <div>
+        <a href="/scan" class="btn btn-primary">📷 Scan-Station öffnen</a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card p-3">
+            <div class="text-muted small">Aktive Artikel</div>
+            <div class="fs-2 fw-bold">{{ anzahl_artikel }}</div>
+            <a href="/materialien" class="small">Artikelliste ansehen →</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <div class="text-muted small">Offene / laufende Aufträge</div>
+            <div class="fs-2 fw-bold">{{ offene_auftraege|length }}</div>
+            <a href="/auftraege" class="small">Aufträge ansehen →</a>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3">
+            <div class="text-muted small">Artikel unter Mindestbestand</div>
+            <div class="fs-2 fw-bold text-danger">{{ unterbestand|length }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-6">
+        <div class="card p-3">
+            <h2 class="h5">Offene Aufträge</h2>
+            {% if offene_auftraege %}
+            <table class="table table-sm">
+                <thead><tr><th>Auftrag</th><th>Artikel</th><th>Bedarf</th><th>Status</th></tr></thead>
+                <tbody>
+                {% for a in offene_auftraege[:10] %}
+                    <tr>
+                        <td><a href="/auftraege/{{ a.id }}">{{ a.auftragsnummer }}</a></td>
+                        <td>{{ a.material.artikelnummer }}</td>
+                        <td>{{ "%.1f"|format(a.rest_kg) }} / {{ "%.1f"|format(a.bedarf_kg) }} kg</td>
+                        <td><span class="badge badge-status-{{ a.status }}">{{ a.status }}</span></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">Keine offenen Aufträge.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-3">
+            <h2 class="h5">Artikel unter Mindestbestand</h2>
+            {% if unterbestand %}
+            <table class="table table-sm">
+                <thead><tr><th>Artikel</th><th>Bestand</th><th>Mindest</th></tr></thead>
+                <tbody>
+                {% for m in unterbestand[:10] %}
+                    <tr class="table-unterbestand">
+                        <td><a href="/materialien/{{ m.id }}">{{ m.artikelnummer }}</a></td>
+                        <td>{{ "%.1f"|format(m.bestand_kg) }} kg</td>
+                        <td>{{ "%.1f"|format(m.mindestbestand_kg) }} kg</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p class="text-muted">Alle Bestände über dem Minimum.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mt-4">
+    <h2 class="h5">Letzte Bewegungen</h2>
+    {% if letzte_bewegungen %}
+    <table class="table table-sm">
+        <thead><tr><th>Zeit</th><th>Artikel</th><th>Menge</th><th>Typ</th><th>Mitarbeiter</th><th>Quelle</th></tr></thead>
+        <tbody>
+        {% for b in letzte_bewegungen %}
+            <tr>
+                <td>{{ b.zeitstempel.strftime("%d.%m.%Y %H:%M") }}</td>
+                <td><a href="/materialien/{{ b.material_id }}">{{ b.material.artikelnummer }}</a></td>
+                <td class="{{ 'text-danger' if b.menge_kg < 0 else 'text-success' }}">{{ "%+.1f"|format(b.menge_kg) }} kg</td>
+                <td>{{ b.typ }}</td>
+                <td>{{ b.mitarbeiter }}</td>
+                <td><span class="text-muted small">{{ b.quelle }}</span></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-muted">Noch keine Bewegungen erfasst.</p>
+    {% endif %}
+</div>
+{% endblock %}

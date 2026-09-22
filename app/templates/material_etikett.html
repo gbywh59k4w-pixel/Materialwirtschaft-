@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Etikett {{ material.artikelnummer }}</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .etikett { display: inline-block; }
+    </style>
+</head>
+<body>
+<div class="no-print mb-3">
+    <button onclick="window.print()">🖨️ Drucken</button>
+</div>
+<div class="etikett">
+    <div style="font-size:1.3rem; font-weight:bold;">{{ material.artikelnummer }}</div>
+    <div>{{ material.legierung_bezeichnung }}</div>
+    <div>Ø {{ "%.2f"|format(material.durchmesser_mm) }} mm</div>
+    <img src="/materialien/{{ material.id }}/qr.png" alt="QR" style="width:180px; height:180px;">
+    <div>Lagerplatz: {{ material.lagerplatz or "-" }}</div>
+</div>
+</body>
+</html>

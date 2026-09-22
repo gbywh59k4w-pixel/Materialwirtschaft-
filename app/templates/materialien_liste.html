@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Artikel{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Artikelstamm ({{ materialien|length }})</h1>
+    <a href="/materialien/neu" class="btn btn-primary">+ Neuer Artikel</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-4">
+        <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Suche: Artikelnummer, Legierung...">
+    </div>
+    <div class="col-md-3">
+        <select name="legierung" class="form-select">
+            <option value="">Alle Legierungen</option>
+            {% for l in alle_legierungen %}
+            <option value="{{ l }}" {% if l == legierung %}selected{% endif %}>{{ l }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3 form-check form-switch d-flex align-items-center">
+        <input class="form-check-input me-2" type="checkbox" name="nur_unterbestand" value="true" id="nurU" {% if nur_unterbestand %}checked{% endif %}>
+        <label class="form-check-label" for="nurU">Nur Unterbestand</label>
+    </div>
+    <div class="col-md-2">
+        <button class="btn btn-outline-secondary w-100" type="submit">Filtern</button>
+    </div>
+</form>
+
+<div class="card">
+<table class="table table-hover mb-0">
+    <thead>
+    <tr>
+        <th>Artikelnummer</th>
+        <th>Ø mm</th>
+        <th>Legierung</th>
+        <th>Bestand</th>
+        <th>Mindestbestand</th>
+        <th>Lagerplatz</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for m in materialien %}
+    <tr class="{{ 'table-unterbestand' if m.unterbestand else '' }}">
+        <td><a href="/materialien/{{ m.id }}">{{ m.artikelnummer }}</a></td>
+        <td>{{ "%.2f"|format(m.durchmesser_mm) }}</td>
+        <td title="{{ m.legierung_bezeichnung }}">{{ m.legierung }}</td>
+        <td>{{ "%.1f"|format(m.bestand_kg) }} kg</td>
+        <td>{{ "%.1f"|format(m.mindestbestand_kg) }} kg</td>
+        <td>{{ m.lagerplatz or "-" }}</td>
+        <td><a href="/materialien/{{ m.id }}" class="btn btn-sm btn-outline-secondary">Öffnen</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="text-center text-muted py-4">Keine Artikel gefunden.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

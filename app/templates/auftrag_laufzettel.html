@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Laufzettel {{ auftrag.auftragsnummer }}</title>
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .zettel { max-width: 420px; border: 1px solid #333; padding: 20px; }
+        table { width: 100%; margin-top: 10px; }
+        td { padding: 4px 0; }
+    </style>
+</head>
+<body>
+<div class="no-print mb-3">
+    <button onclick="window.print()">🖨️ Drucken</button>
+</div>
+<div class="zettel">
+    <h2>Fertigungsauftrag</h2>
+    <h1 style="font-size:1.8rem;">{{ auftrag.auftragsnummer }}</h1>
+    <div style="text-align:center;">
+        <img src="/auftraege/{{ auftrag.id }}/qr.png" alt="QR" style="width:200px; height:200px;">
+    </div>
+    <table>
+        <tr><td><strong>Bezeichnung</strong></td><td>{{ auftrag.bezeichnung or "-" }}</td></tr>
+        <tr><td><strong>Artikel</strong></td><td>{{ auftrag.material.artikelnummer }}</td></tr>
+        <tr><td><strong>Beschreibung</strong></td><td>{{ auftrag.material.legierung_bezeichnung }}, Ø {{ "%.2f"|format(auftrag.material.durchmesser_mm) }} mm</td></tr>
+        <tr><td><strong>Bedarf</strong></td><td>{{ "%.1f"|format(auftrag.bedarf_kg) }} kg</td></tr>
+        <tr><td><strong>Erstellt von</strong></td><td>{{ auftrag.erstellt_von or "-" }}</td></tr>
+        <tr><td><strong>Erstellt am</strong></td><td>{{ auftrag.erstellt_am.strftime("%d.%m.%Y %H:%M") }}</td></tr>
+    </table>
+    <p style="margin-top:16px; font-size:0.9rem; color:#555;">
+        Diesen Zettel an der Scan-Station scannen, um den Materialbedarf automatisch aus dem Lager auszubuchen.
+    </p>
+</div>
+</body>
+</html>

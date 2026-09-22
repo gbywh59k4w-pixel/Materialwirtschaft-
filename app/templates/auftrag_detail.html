@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ auftrag.auftragsnummer }}{% endblock %}
+{% block content %}
+{% if fehler %}<div class="alert alert-danger">{{ fehler }}</div>{% endif %}
+{% if request.query_params.get('gebucht') %}<div class="alert alert-success">Buchung erfolgreich erfasst.</div>{% endif %}
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h3 mb-0">{{ auftrag.auftragsnummer }} <span class="badge badge-status-{{ auftrag.status }}">{{ auftrag.status }}</span></h1>
+        <div class="text-muted">{{ auftrag.bezeichnung or "" }}</div>
+    </div>
+    <div>
+        <a href="/auftraege/{{ auftrag.id }}/laufzettel" class="btn btn-outline-secondary" target="_blank">🖨️ Laufzettel drucken</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <img src="/auftraege/{{ auftrag.id }}/qr.png" alt="QR-Code {{ auftrag.auftragsnummer }}" class="img-fluid mb-2">
+            <div class="fw-bold">{{ auftrag.auftragsnummer }}</div>
+            <div class="small text-muted">Diesen Code an der Scan-Station scannen</div>
+        </div>
+        <div class="card p-3 mt-3">
+            <div class="d-flex justify-content-between"><span>Artikel</span><a href="/materialien/{{ auftrag.material_id }}">{{ auftrag.material.artikelnummer }}</a></div>
+            <div class="d-flex justify-content-between"><span>Bedarf</span><span>{{ "%.1f"|format(auftrag.bedarf_kg) }} kg</span></div>
+            <div class="d-flex justify-content-between"><span>Gebucht</span><span>{{ "%.1f"|format(auftrag.gebucht_kg) }} kg</span></div>
+            <div class="d-flex justify-content-between"><span>Rest</span><span class="fw-bold">{{ "%.1f"|format(auftrag.rest_kg) }} kg</span></div>
+            <div class="progress mt-2" style="height:10px;">
+                <div class="progress-bar" style="width:{{ auftrag.fortschritt_prozent }}%;"></div>
+            </div>
+            <div class="small text-muted mt-2">Aktueller Lagerbestand: {{ "%.1f"|format(auftrag.material.bestand_kg) }} kg</div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        {% if auftrag.status not in ("erledigt", "storniert") %}
+        <div class="card p-3">
+            <h2 class="h6">Bedarf ausbuchen</h2>
+            <form method="post" action="/auftraege/{{ auftrag.id }}/buchen" class="row g-2">
+                <div class="col-md-4">
+                    <input type="number" step="0.1" min="0.01" name="menge_kg" class="form-control" value="{{ "%.1f"|format(auftrag.rest_kg) }}" required>
+                </div>
+                <div class="col-md-4">
+                    <select name="mitarbeiter" class="form-select" required>
+                        <option value="">Mitarbeiter wählen...</option>
+                        {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-danger w-100" type="submit">Ausbuchen</button>
+                </div>
+                <div class="col-12">
+                    <input type="text" name="notiz" class="form-control" placeholder="Notiz (optional)">
+                </div>
+                <div class="col-12 form-check">
+                    <input class="form-check-input" type="checkbox" name="erlaube_negativ" value="true" id="negA{{auftrag.id}}">
+                    <label class="form-check-label small" for="negA{{auftrag.id}}">Buchung ins Minus erlauben</label>
+                </div>
+            </form>
+        </div>
+
+        <form method="post" action="/auftraege/{{ auftrag.id }}/stornieren" class="mt-2"
+              onsubmit="return confirm('Auftrag wirklich stornieren?');">
+            <button class="btn btn-outline-danger btn-sm" type="submit">Auftrag stornieren</button>
+        </form>
+        {% endif %}
+
+        <div class="card p-3 mt-3">
+            <h2 class="h6">Buchungen zu diesem Auftrag</h2>
+            <table class="table table-sm">
+                <thead><tr><th>Zeit</th><th>Menge</th><th>Mitarbeiter</th><th>Quelle</th><th>Notiz</th></tr></thead>
+                <tbody>
+                {% for b in bewegungen %}
+                    <tr>
+                        <td>{{ b.zeitstempel.strftime("%d.%m.%Y %H:%M") }}</td>
+                        <td class="text-danger">{{ "%.1f"|format(-b.menge_kg) }} kg</td>
+                        <td>{{ b.mitarbeiter }}</td>
+                        <td><span class="text-muted small">{{ b.quelle }}</span></td>
+                        <td>{{ b.notiz or "" }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="5" class="text-center text-muted">Noch keine Buchungen.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Artikel scannen{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 600px;">
+    <h1 class="h4 text-center">{{ material.artikelnummer }}</h1>
+    <p class="text-center text-muted">{{ material.legierung_bezeichnung }}, Ø {{ "%.2f"|format(material.durchmesser_mm) }} mm</p>
+    <p class="text-center">Lagerbestand: <strong>{{ "%.1f"|format(material.bestand_kg) }} kg</strong></p>
+
+    {% if offene_auftraege %}
+    <div class="alert alert-info">
+        Für diesen Artikel gibt es offene Aufträge. Bitte stattdessen den Auftrags-Code (Laufzettel) scannen,
+        damit die Menge dem richtigen Auftrag zugeordnet wird.
+        <ul class="mb-0 mt-2">
+        {% for a in offene_auftraege %}
+            <li><a href="/auftraege/{{ a.id }}">{{ a.auftragsnummer }}</a> – {{ "%.1f"|format(a.rest_kg) }} kg offen</li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <h2 class="h6 mt-2">Ohne Auftragsbezug direkt ausbuchen</h2>
+    <form method="post" action="/materialien/{{ material.id }}/ausbuchen">
+        <input type="hidden" name="quelle" value="scan_artikel">
+        <div class="mb-3">
+            <label class="form-label">Entnommene Menge (kg)</label>
+            <input type="number" step="0.1" min="0.01" name="menge_kg" id="menge-input"
+                   class="form-control form-control-lg text-center" required autofocus>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mitarbeiter</label>
+            <select name="mitarbeiter" id="mitarbeiter-select" class="form-select" required>
+                <option value="">Mitarbeiter wählen...</option>
+                {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+            </select>
+        </div>
+        <input type="text" name="notiz" class="form-control mb-3" placeholder="Notiz (optional)">
+        <button type="submit" class="btn btn-danger btn-lg w-100">✓ Bestätigen und ausbuchen</button>
+    </form>
+    <a href="/scan" class="btn btn-link w-100 mt-2">Abbrechen / zurück zum Scannen</a>
+</div>
+<script src="/static/js/mitarbeiter_merken.js"></script>
+{% endblock %}

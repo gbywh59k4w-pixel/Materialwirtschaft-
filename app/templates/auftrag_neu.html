@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Neuer Auftrag{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Neuen Auftrag anlegen</h1>
+{% if fehler %}<div class="alert alert-danger">{{ fehler }}</div>{% endif %}
+<div class="card p-4" style="max-width: 600px;">
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Artikel (Durchmesser / Legierung)</label>
+        <select name="material_id" class="form-select" required>
+            <option value="">Artikel wählen...</option>
+            {% for m in materialien %}
+            <option value="{{ m.id }}">{{ m.artikelnummer }} – {{ m.legierung_bezeichnung }} (Bestand {{ "%.0f"|format(m.bestand_kg) }} kg)</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Bedarf (kg)</label>
+        <input type="number" step="0.1" min="0.1" name="bedarf_kg" class="form-control" required placeholder="z.B. 500">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Bezeichnung / Zweck</label>
+        <input type="text" name="bezeichnung" class="form-control" placeholder="z.B. Fertigungsauftrag Federnproduktion Linie 2">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Erstellt von</label>
+        <select name="erstellt_von" class="form-select">
+            <option value="">-</option>
+            {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Auftrag anlegen</button>
+    <a href="/auftraege" class="btn btn-link">Abbrechen</a>
+</form>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Auftrag scannen{% endblock %}
+{% block content %}
+<div class="card p-4 mx-auto" style="max-width: 600px;">
+    <h1 class="h4 text-center">Auftrag {{ auftrag.auftragsnummer }}</h1>
+    <p class="text-center text-muted">{{ auftrag.bezeichnung or "" }}</p>
+
+    <table class="table">
+        <tr><td>Artikel</td><td class="text-end fw-bold">{{ auftrag.material.artikelnummer }}</td></tr>
+        <tr><td>Beschreibung</td><td class="text-end">{{ auftrag.material.legierung_bezeichnung }}, Ø {{ "%.2f"|format(auftrag.material.durchmesser_mm) }} mm</td></tr>
+        <tr><td>Bedarf gesamt</td><td class="text-end">{{ "%.1f"|format(auftrag.bedarf_kg) }} kg</td></tr>
+        <tr><td>Bereits gebucht</td><td class="text-end">{{ "%.1f"|format(auftrag.gebucht_kg) }} kg</td></tr>
+        <tr><td>Noch offen</td><td class="text-end fw-bold">{{ "%.1f"|format(auftrag.rest_kg) }} kg</td></tr>
+        <tr><td>Lagerbestand</td><td class="text-end">{{ "%.1f"|format(auftrag.material.bestand_kg) }} kg</td></tr>
+    </table>
+
+    <form method="post" action="/auftraege/{{ auftrag.id }}/buchen">
+        <input type="hidden" name="quelle" value="scan_auftrag">
+        <div class="mb-3">
+            <label class="form-label">Menge, die jetzt entnommen wird (kg)</label>
+            <input type="number" step="0.1" min="0.01" name="menge_kg" id="menge-input"
+                   value="{{ "%.1f"|format(auftrag.rest_kg) }}" class="form-control form-control-lg text-center" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Mitarbeiter</label>
+            <select name="mitarbeiter" id="mitarbeiter-select" class="form-select" required>
+                <option value="">Mitarbeiter wählen...</option>
+                {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+            </select>
+        </div>
+        <input type="text" name="notiz" class="form-control mb-3" placeholder="Notiz (optional)">
+        <button type="submit" class="btn btn-danger btn-lg w-100">✓ Bestätigen und ausbuchen</button>
+    </form>
+    <a href="/scan" class="btn btn-link w-100 mt-2">Abbrechen / zurück zum Scannen</a>
+</div>
+<script src="/static/js/mitarbeiter_merken.js"></script>
+{% endblock %}

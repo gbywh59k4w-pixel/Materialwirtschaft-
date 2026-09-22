@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{ material.artikelnummer }}{% endblock %}
+{% block content %}
+{% if fehler %}<div class="alert alert-danger">{{ fehler }}</div>{% endif %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+        <h1 class="h3 mb-0">{{ material.artikelnummer }}</h1>
+        <div class="text-muted">{{ material.legierung_bezeichnung }} · Ø {{ "%.2f"|format(material.durchmesser_mm) }} mm</div>
+    </div>
+    <a href="/materialien/{{ material.id }}/etikett" class="btn btn-outline-secondary" target="_blank">🖨️ Etikett drucken</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card p-3 text-center">
+            <img src="/materialien/{{ material.id }}/qr.png" alt="QR-Code {{ material.artikelnummer }}" class="img-fluid mb-2">
+            <div class="fw-bold">{{ material.artikelnummer }}</div>
+        </div>
+        <div class="card p-3 mt-3">
+            <div class="d-flex justify-content-between"><span>Bestand</span><span class="fw-bold {{ 'text-danger' if material.unterbestand else '' }}">{{ "%.1f"|format(material.bestand_kg) }} kg</span></div>
+            <div class="d-flex justify-content-between"><span>Mindestbestand</span><span>{{ "%.1f"|format(material.mindestbestand_kg) }} kg</span></div>
+            <div class="d-flex justify-content-between"><span>Lagerplatz</span><span>{{ material.lagerplatz or "-" }}</span></div>
+            {% if material.unterbestand %}<div class="alert alert-warning mt-2 mb-0 py-1 px-2 small">⚠ Unter Mindestbestand</div>{% endif %}
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h2 class="h6">Wareneingang buchen</h2>
+                    <form method="post" action="/materialien/{{ material.id }}/wareneingang">
+                        <div class="mb-2">
+                            <input type="number" step="0.1" min="0.01" name="menge_kg" class="form-control" placeholder="Menge (kg)" required>
+                        </div>
+                        <div class="mb-2">
+                            <select name="mitarbeiter" class="form-select" required>
+                                <option value="">Mitarbeiter wählen...</option>
+                                {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <input type="text" name="notiz" class="form-control mb-2" placeholder="Notiz (optional)">
+                        <button class="btn btn-success w-100" type="submit">+ Einbuchen</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3">
+                    <h2 class="h6">Manuell ausbuchen</h2>
+                    <form method="post" action="/materialien/{{ material.id }}/ausbuchen">
+                        <div class="mb-2">
+                            <input type="number" step="0.1" min="0.01" name="menge_kg" class="form-control" placeholder="Menge (kg)" required>
+                        </div>
+                        <div class="mb-2">
+                            <select name="mitarbeiter" class="form-select" required>
+                                <option value="">Mitarbeiter wählen...</option>
+                                {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <input type="text" name="notiz" class="form-control mb-2" placeholder="Notiz (optional)">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="erlaube_negativ" value="true" id="negM{{material.id}}">
+                            <label class="form-check-label small" for="negM{{material.id}}">Buchung ins Minus erlauben</label>
+                        </div>
+                        <button class="btn btn-danger w-100" type="submit">− Ausbuchen</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if offene_auftraege %}
+        <div class="card p-3 mt-3">
+            <h2 class="h6">Offene Aufträge für diesen Artikel</h2>
+            <ul class="list-group list-group-flush">
+            {% for a in offene_auftraege %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <a href="/auftraege/{{ a.id }}">{{ a.auftragsnummer }}</a>
+                    <span>{{ "%.1f"|format(a.rest_kg) }} kg offen</span>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <div class="card p-3 mt-3">
+            <details>
+                <summary class="h6" style="cursor:pointer;">Bestandskorrektur (Inventur)</summary>
+                <form method="post" action="/materialien/{{ material.id }}/korrektur" class="row g-2 mt-2">
+                    <div class="col-md-4">
+                        <input type="number" step="0.1" min="0" name="neuer_bestand_kg" class="form-control" placeholder="Neuer Bestand (kg)" required>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="mitarbeiter" class="form-select" required>
+                            <option value="">Mitarbeiter...</option>
+                            {% for m in mitarbeiter %}<option value="{{ m.name }}">{{ m.name }}</option>{% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-secondary w-100" type="submit">Bestand korrigieren</button>
+                    </div>
+                </form>
+            </details>
+        </div>
+
+        <div class="card p-3 mt-3">
+            <h2 class="h6">Bewegungshistorie</h2>
+            <table class="table table-sm">
+                <thead><tr><th>Zeit</th><th>Menge</th><th>Typ</th><th>Mitarbeiter</th><th>Auftrag</th><th>Bestand danach</th></tr></thead>
+                <tbody>
+                {% for b in bewegungen %}
+                    <tr>
+                        <td>{{ b.zeitstempel.strftime("%d.%m.%Y %H:%M") }}</td>
+                        <td class="{{ 'text-danger' if b.menge_kg < 0 else 'text-success' }}">{{ "%+.1f"|format(b.menge_kg) }} kg</td>
+                        <td>{{ b.typ }}</td>
+                        <td>{{ b.mitarbeiter }}</td>
+                        <td>{% if b.auftrag %}<a href="/auftraege/{{ b.auftrag_id }}">{{ b.auftrag.auftragsnummer }}</a>{% else %}-{% endif %}</td>
+                        <td>{{ "%.1f"|format(b.bestand_nach_kg) }} kg</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6" class="text-center text-muted">Noch keine Bewegungen.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

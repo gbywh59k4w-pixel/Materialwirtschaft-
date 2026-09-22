@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Neuer Artikel{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Neuen Draht-Artikel anlegen</h1>
+{% if fehler %}<div class="alert alert-danger">{{ fehler }}</div>{% endif %}
+<div class="card p-4" style="max-width: 560px;">
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">Durchmesser (mm)</label>
+        <input type="number" step="0.01" min="0.01" name="durchmesser_mm" class="form-control" required
+               value="{{ werte.get('durchmesser_mm', '') }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Legierungs-Code (z.B. C4C, 1.4301)</label>
+        <input type="text" name="legierung" class="form-control" required
+               value="{{ werte.get('legierung', '') }}">
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Legierungs-Bezeichnung</label>
+        <input type="text" name="legierung_bezeichnung" class="form-control"
+               value="{{ werte.get('legierung_bezeichnung', '') }}" placeholder="z.B. Kohlenstoffstahl C4C">
+    </div>
+    <div class="row">
+        <div class="col-6 mb-3">
+            <label class="form-label">Anfangsbestand (kg)</label>
+            <input type="number" step="0.1" min="0" name="bestand_kg" class="form-control" value="{{ werte.get('bestand_kg', 0) }}">
+        </div>
+        <div class="col-6 mb-3">
+            <label class="form-label">Mindestbestand (kg)</label>
+            <input type="number" step="0.1" min="0" name="mindestbestand_kg" class="form-control" value="{{ werte.get('mindestbestand_kg', 0) }}">
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Lagerplatz</label>
+        <input type="text" name="lagerplatz" class="form-control" value="{{ werte.get('lagerplatz', '') }}" placeholder="z.B. L3-12">
+    </div>
+    <button type="submit" class="btn btn-primary">Artikel anlegen</button>
+    <a href="/materialien" class="btn btn-link">Abbrechen</a>
+</form>
+</div>
+{% endblock %}

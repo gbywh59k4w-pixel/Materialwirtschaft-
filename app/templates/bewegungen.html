@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Bewegungen{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Bewegungshistorie</h1>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-3">
+        <select name="typ" class="form-select" onchange="this.form.submit()">
+            <option value="">Alle Typen</option>
+            <option value="Ausgang" {% if typ=="Ausgang" %}selected{% endif %}>Ausgang</option>
+            <option value="Eingang" {% if typ=="Eingang" %}selected{% endif %}>Eingang</option>
+            <option value="Korrektur" {% if typ=="Korrektur" %}selected{% endif %}>Korrektur</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select name="mitarbeiter" class="form-select" onchange="this.form.submit()">
+            <option value="">Alle Mitarbeiter</option>
+            {% for m in alle_mitarbeiter %}
+            <option value="{{ m }}" {% if m==mitarbeiter %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+<div class="card">
+<table class="table table-sm table-hover mb-0">
+    <thead>
+    <tr><th>Zeit</th><th>Artikel</th><th>Menge</th><th>Typ</th><th>Mitarbeiter</th><th>Quelle</th><th>Auftrag</th><th>Bestand danach</th><th>Notiz</th></tr>
+    </thead>
+    <tbody>
+    {% for b in bewegungen %}
+    <tr>
+        <td>{{ b.zeitstempel.strftime("%d.%m.%Y %H:%M") }}</td>
+        <td><a href="/materialien/{{ b.material_id }}">{{ b.material.artikelnummer }}</a></td>
+        <td class="{{ 'text-danger' if b.menge_kg < 0 else 'text-success' }}">{{ "%+.1f"|format(b.menge_kg) }} kg</td>
+        <td>{{ b.typ }}</td>
+        <td>{{ b.mitarbeiter }}</td>
+        <td><span class="text-muted small">{{ b.quelle }}</span></td>
+        <td>{% if b.auftrag %}<a href="/auftraege/{{ b.auftrag_id }}">{{ b.auftrag.auftragsnummer }}</a>{% else %}-{% endif %}</td>
+        <td>{{ "%.1f"|format(b.bestand_nach_kg) }} kg</td>
+        <td>{{ b.notiz or "" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="9" class="text-center text-muted py-4">Keine Bewegungen gefunden.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

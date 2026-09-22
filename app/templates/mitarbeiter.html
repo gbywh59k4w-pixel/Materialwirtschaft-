@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Mitarbeiter{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Mitarbeiter</h1>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-3">
+            <table class="table table-sm">
+                <thead><tr><th>Name</th><th>Kürzel</th><th>Status</th><th></th></tr></thead>
+                <tbody>
+                {% for m in mitarbeiter %}
+                <tr>
+                    <td>{{ m.name }}</td>
+                    <td>{{ m.kuerzel or "-" }}</td>
+                    <td>{% if m.aktiv %}<span class="badge bg-success">aktiv</span>{% else %}<span class="badge bg-secondary">inaktiv</span>{% endif %}</td>
+                    <td>
+                        <form method="post" action="/mitarbeiter/{{ m.id }}/deaktivieren">
+                            <button class="btn btn-sm btn-outline-secondary" type="submit">
+                                {{ "Deaktivieren" if m.aktiv else "Aktivieren" }}
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3">
+            <h2 class="h6">Neuen Mitarbeiter anlegen</h2>
+            <form method="post" action="/mitarbeiter/neu">
+                <div class="mb-2">
+                    <input type="text" name="name" class="form-control" placeholder="Name" required>
+                </div>
+                <div class="mb-2">
+                    <input type="text" name="kuerzel" class="form-control" placeholder="Kürzel (optional)">
+                </div>
+                <button class="btn btn-primary" type="submit">Anlegen</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
