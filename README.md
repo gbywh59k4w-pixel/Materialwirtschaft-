@@ -5,6 +5,24 @@ Artikeln (Kombinationen aus Durchmesser und Legierung), QR-Code-Etiketten
 und einer Scan-Station, an der Mitarbeiter Materialbedarf direkt am
 Computer austragen können.
 
+## Sofort im Browser testen (ohne Installation)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/gbywh59k4w-pixel/Materialwirtschaft-)
+
+Klick auf den Button oben → bei Render.com anmelden/registrieren (kostenlos,
+keine Kreditkarte nötig) → GitHub-Zugriff auf dieses Repository erlauben →
+„Apply". Nach ca. 1–2 Minuten Build-Zeit ist die App unter einer echten
+`https://...onrender.com`-Adresse erreichbar, die Sie direkt im Browser
+öffnen und mit jedem Gerät (auch dem iPad) teilen können.
+
+Hinweise zur kostenlosen Render-Stufe: Der Dienst legt sich nach 15 Minuten
+Inaktivität schlafen und braucht beim nächsten Aufruf ca. 30–60 Sekunden zum
+Aufwachen – für einen schnellen Test völlig ausreichend. Die Datenbank ist
+auf der kostenlosen Stufe nicht dauerhaft gespeichert und setzt sich bei
+jedem Neustart/Deploy auf die Beispieldaten zurück; für den dauerhaften
+Firmeneinsatz eignet sich das nicht (siehe stattdessen die Windows- bzw.
+iPad-Anleitung für den lokalen Betrieb im Firmennetz).
+
 ## Kernfunktionen
 
 - **Artikelstamm**: ~160 Drahtartikel (z.B. `DR-4.90-C4C` = 4,90 mm,
